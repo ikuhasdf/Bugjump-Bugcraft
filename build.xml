@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Bugcraft" default="jar" basedir=".">
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="dist.jar" value="${dist.dir}/MyGame.jar"/>
+
+    <target name="init">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" source="1.8" target="1.8" includeantruntime="false" fork="true" encoding="UTF-8">
+            <classpath>
+                <fileset dir="E:/JME3.1/jmonkeyplatform/libs" includes="*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${build.dir}/fatjar"/>
+        
+        <unzip dest="${build.dir}/fatjar">
+            <fileset dir="E:/JME3.1/jmonkeyplatform/libs" includes="*.jar"/>
+        </unzip>
+        
+        <copy todir="${build.dir}/fatjar">
+            <fileset dir="${classes.dir}"/>
+        </copy>
+        
+        <!-- 关键改动：直接复制到 fatjar 根目录，不创建 assets 子目录 -->
+        <copy todir="${build.dir}/fatjar">
+            <fileset dir="assets"/>
+        </copy>
+        
+        <jar destfile="${dist.jar}" basedir="${build.dir}/fatjar">
+            <manifest>
+                <attribute name="Main-Class" value="mygame.Main"/>
+            </manifest>
+        </jar>
+        
+        <delete dir="${build.dir}/fatjar"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+    <target name="default" depends="clean, jar"/>
+</project>
